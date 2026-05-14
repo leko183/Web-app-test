@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crypto Unit Converter</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -47,6 +48,8 @@
       align-items: flex-start;
       justify-content: center;
       padding: 2rem 1rem;
+      gap: 1.5rem;
+      flex-wrap: wrap;
     }
 
     .card {
@@ -55,7 +58,7 @@
       border: 0.5px solid var(--border);
       padding: 2rem;
       width: 100%;
-      max-width: 560px;
+      max-width: 520px;
     }
 
     .header { margin-bottom: 1.75rem; }
@@ -72,16 +75,9 @@
 
     .header h1 i { font-size: 22px; color: var(--text-secondary); }
 
-    .header p {
-      font-size: 13px;
-      color: var(--text-tertiary);
-    }
+    .header p { font-size: 13px; color: var(--text-tertiary); }
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 1.5rem;
-    }
+    .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
 
     .tab {
       padding: 7px 18px;
@@ -127,17 +123,8 @@
       margin-bottom: 10px;
     }
 
-    .unit-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .unit-sub {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 2px;
-    }
+    .unit-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .unit-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
 
     .unit-input {
       background: var(--bg-secondary);
@@ -153,13 +140,7 @@
     }
 
     .unit-input:hover { border-color: var(--border-hover); }
-
-    .unit-input:focus {
-      border-color: var(--border-focus);
-      background: var(--bg);
-    }
-
-    /* Chrome: hide number spinners */
+    .unit-input:focus { border-color: var(--border-focus); background: var(--bg); }
     .unit-input::-webkit-outer-spin-button,
     .unit-input::-webkit-inner-spin-button { -webkit-appearance: none; }
     .unit-input[type=number] { -moz-appearance: textfield; }
@@ -168,7 +149,6 @@
       background: transparent;
       border: 0.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 0;
       cursor: pointer;
       color: var(--text-secondary);
       display: flex;
@@ -180,12 +160,7 @@
       font-size: 16px;
     }
 
-    .copy-btn:hover {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border-color: var(--border-hover);
-    }
-
+    .copy-btn:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-hover); }
     .copy-btn:active { transform: scale(0.95); }
 
     .info-bar {
@@ -201,11 +176,7 @@
 
     .info-bar strong { color: var(--text-primary); font-weight: 500; }
 
-    .reset-row {
-      margin-top: 1.25rem;
-      display: flex;
-      justify-content: flex-end;
-    }
+    .reset-row { margin-top: 1.25rem; display: flex; justify-content: flex-end; }
 
     .reset-btn {
       background: transparent;
@@ -224,6 +195,89 @@
 
     .reset-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
 
+    /* History panel */
+    .history-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      padding: 2rem;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .history-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-title i { font-size: 18px; color: var(--text-secondary); }
+
+    .clear-btn {
+      background: transparent;
+      border: none;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      padding: 4px 8px;
+      border-radius: var(--radius-md);
+      transition: all 0.15s;
+    }
+
+    .clear-btn:hover { color: var(--text-secondary); background: var(--bg-secondary); }
+
+    .history-list { display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+
+    .history-item {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      border: 0.5px solid var(--border);
+    }
+
+    .history-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .history-chain {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+
+    .history-time { font-size: 11px; color: var(--text-tertiary); }
+
+    .history-value {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+
+    .history-unit { font-size: 12px; color: var(--text-secondary); }
+
+    .history-empty {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 1.5rem 0;
+    }
+
     .toast {
       position: fixed;
       bottom: 24px;
@@ -241,25 +295,20 @@
       z-index: 999;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @media (max-width: 480px) {
-      .card { padding: 1.25rem; }
+      .card, .history-card { padding: 1.25rem; max-width: 100%; }
       .unit-row { grid-template-columns: 90px 1fr 36px; }
     }
   </style>
 </head>
 <body>
 
+<!-- Converter -->
 <div class="card">
   <div class="header">
-    <h1>
-      <i class="ti ti-arrows-exchange" aria-hidden="true"></i>
-      Crypto Unit Converter
-    </h1>
+    <h1><i class="ti ti-arrows-exchange" aria-hidden="true"></i> Crypto Unit Converter</h1>
     <p>Nhập vào bất kỳ ô nào — các ô còn lại tự động tính</p>
   </div>
 
@@ -272,107 +321,106 @@
     </button>
   </div>
 
-  <!-- BTC Panel -->
+  <!-- BTC -->
   <div class="panel active" id="panel-btc">
     <div class="chain-label">Bitcoin units</div>
-
     <div class="unit-row">
       <div><div class="unit-name">BTC</div><div class="unit-sub">Bitcoin</div></div>
       <input class="unit-input" id="btc-btc" type="number" placeholder="0" oninput="convertBTC('btc', this.value)" />
-      <button class="copy-btn" onclick="copyVal('btc-btc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('btc-btc')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">mBTC</div><div class="unit-sub">Millibitcoin</div></div>
       <input class="unit-input" id="btc-mbtc" type="number" placeholder="0" oninput="convertBTC('mbtc', this.value)" />
-      <button class="copy-btn" onclick="copyVal('btc-mbtc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('btc-mbtc')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">μBTC</div><div class="unit-sub">Microbitcoin / Bit</div></div>
       <input class="unit-input" id="btc-ubtc" type="number" placeholder="0" oninput="convertBTC('ubtc', this.value)" />
-      <button class="copy-btn" onclick="copyVal('btc-ubtc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('btc-ubtc')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Satoshi</div><div class="unit-sub">Smallest unit</div></div>
       <input class="unit-input" id="btc-sat" type="number" placeholder="0" oninput="convertBTC('sat', this.value)" />
-      <button class="copy-btn" onclick="copyVal('btc-sat')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('btc-sat')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
-    <div class="info-bar">
-      <strong>1 BTC</strong> = 1,000 mBTC = 1,000,000 μBTC = <strong>100,000,000 Satoshi</strong>
-    </div>
-
+    <div class="info-bar"><strong>1 BTC</strong> = 1,000 mBTC = 1,000,000 μBTC = <strong>100,000,000 Satoshi</strong></div>
     <div class="reset-row">
-      <button class="reset-btn" onclick="resetBTC()">
-        <i class="ti ti-refresh" aria-hidden="true"></i> Reset
-      </button>
+      <button class="reset-btn" onclick="resetBTC()"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
     </div>
   </div>
 
-  <!-- ETH Panel -->
+  <!-- ETH -->
   <div class="panel" id="panel-eth">
     <div class="chain-label">Ethereum units</div>
-
     <div class="unit-row">
       <div><div class="unit-name">ETH</div><div class="unit-sub">Ether</div></div>
       <input class="unit-input" id="eth-eth" type="number" placeholder="0" oninput="convertETH('eth', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-eth')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-eth')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Finney</div><div class="unit-sub">1e-3 ETH</div></div>
       <input class="unit-input" id="eth-finney" type="number" placeholder="0" oninput="convertETH('finney', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-finney')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-finney')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Szabo</div><div class="unit-sub">1e-6 ETH</div></div>
       <input class="unit-input" id="eth-szabo" type="number" placeholder="0" oninput="convertETH('szabo', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-szabo')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-szabo')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Gwei</div><div class="unit-sub">Gas unit (1e-9)</div></div>
       <input class="unit-input" id="eth-gwei" type="number" placeholder="0" oninput="convertETH('gwei', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-gwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-gwei')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Mwei</div><div class="unit-sub">1e-12 ETH</div></div>
       <input class="unit-input" id="eth-mwei" type="number" placeholder="0" oninput="convertETH('mwei', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-mwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-mwei')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Kwei</div><div class="unit-sub">1e-15 ETH</div></div>
       <input class="unit-input" id="eth-kwei" type="number" placeholder="0" oninput="convertETH('kwei', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-kwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-kwei')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
     <div class="unit-row">
       <div><div class="unit-name">Wei</div><div class="unit-sub">Smallest unit</div></div>
       <input class="unit-input" id="eth-wei" type="number" placeholder="0" oninput="convertETH('wei', this.value)" />
-      <button class="copy-btn" onclick="copyVal('eth-wei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+      <button class="copy-btn" onclick="copyVal('eth-wei')"><i class="ti ti-copy" aria-hidden="true"></i></button>
     </div>
-
-    <div class="info-bar">
-      <strong>1 ETH</strong> = 10<sup>9</sup> Gwei = <strong>1,000,000,000,000,000,000 Wei</strong> (10<sup>18</sup>)
-    </div>
-
+    <div class="info-bar"><strong>1 ETH</strong> = 10<sup>9</sup> Gwei = <strong>10<sup>18</sup> Wei</strong></div>
     <div class="reset-row">
-      <button class="reset-btn" onclick="resetETH()">
-        <i class="ti ti-refresh" aria-hidden="true"></i> Reset
-      </button>
+      <button class="reset-btn" onclick="resetETH()"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
     </div>
+  </div>
+</div>
+
+<!-- History -->
+<div class="history-card">
+  <div class="history-header">
+    <div class="history-title">
+      <i class="ti ti-history" aria-hidden="true"></i> Lịch sử
+    </div>
+    <button class="clear-btn" onclick="clearHistory()">Xóa tất cả</button>
+  </div>
+  <div class="history-list" id="history-list">
+    <div class="history-empty">Chưa có lịch sử</div>
   </div>
 </div>
 
 <div class="toast" id="toast">Copied!</div>
 
 <script>
+  const SUPABASE_URL = 'https://cjxchdgawtbsbmlcumvr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_48nP37ykc2NS2ynbs7L8nw_abD9KJoI';
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let saveTimer = null;
+  let currentChain = 'btc';
+
   function switchTab(chain) {
+    currentChain = chain;
     document.querySelectorAll('.tab').forEach((t, i) =>
       t.classList.toggle('active', (chain === 'btc' && i === 0) || (chain === 'eth' && i === 1))
     );
@@ -385,8 +433,51 @@
     return parseFloat(n.toPrecision(15)).toString();
   }
 
+  function scheduleSave(chain, unit, value) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveHistory(chain, unit, value), 1200);
+  }
+
+  async function saveHistory(chain, fromUnit, fromValue) {
+    if (!fromValue || fromValue === '0') return;
+    const { error } = await db.from('conversion_history').insert({ chain, from_unit: fromUnit, from_value: fromValue });
+    if (!error) loadHistory();
+  }
+
+  async function loadHistory() {
+    const { data, error } = await db
+      .from('conversion_history')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error || !data) return;
+    renderHistory(data);
+  }
+
+  function renderHistory(items) {
+    const el = document.getElementById('history-list');
+    if (!items.length) { el.innerHTML = '<div class="history-empty">Chưa có lịch sử</div>'; return; }
+    el.innerHTML = items.map(item => {
+      const d = new Date(item.created_at);
+      const time = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      return `<div class="history-item">
+        <div class="history-item-top">
+          <span class="history-chain">${item.chain.toUpperCase()}</span>
+          <span class="history-time">${time}</span>
+        </div>
+        <span class="history-value">${item.from_value}</span>
+        <span class="history-unit"> ${item.from_unit}</span>
+      </div>`;
+    }).join('');
+  }
+
+  async function clearHistory() {
+    await db.from('conversion_history').delete().neq('id', 0);
+    document.getElementById('history-list').innerHTML = '<div class="history-empty">Chưa có lịch sử</div>';
+  }
+
   function convertBTC(from, raw) {
-    const ids = ['btc-btc', 'btc-mbtc', 'btc-ubtc', 'btc-sat'];
+    const ids = ['btc-btc','btc-mbtc','btc-ubtc','btc-sat'];
     if (raw === '') { ids.forEach(id => { if (document.getElementById(id) !== document.activeElement) document.getElementById(id).value = ''; }); return; }
     const v = parseFloat(raw);
     if (isNaN(v)) return;
@@ -397,6 +488,7 @@
     if (from === 'sat')  btc = v / 1e8;
     const vals = [btc, btc * 1e3, btc * 1e6, Math.round(btc * 1e8)];
     ids.forEach((id, i) => { const el = document.getElementById(id); if (document.activeElement !== el) el.value = fmt(vals[i]); });
+    scheduleSave('btc', from, raw);
   }
 
   function convertETH(from, raw) {
@@ -404,7 +496,7 @@
     if (raw === '') { ids.forEach(id => { if (document.getElementById(id) !== document.activeElement) document.getElementById(id).value = ''; }); return; }
     const v = parseFloat(raw);
     if (isNaN(v)) return;
-    const E = (exp) => Math.pow(10, exp);
+    const E = exp => Math.pow(10, exp);
     let wei;
     if (from === 'eth')    wei = v * E(18);
     if (from === 'finney') wei = v * E(15);
@@ -414,24 +506,16 @@
     if (from === 'kwei')   wei = v * E(3);
     if (from === 'wei')    wei = v;
     const map = [
-      ['eth-eth',    wei / E(18)],
-      ['eth-finney', wei / E(15)],
-      ['eth-szabo',  wei / E(12)],
-      ['eth-gwei',   wei / E(9)],
-      ['eth-mwei',   wei / E(6)],
-      ['eth-kwei',   wei / E(3)],
-      ['eth-wei',    Math.round(wei)],
+      ['eth-eth', wei/E(18)], ['eth-finney', wei/E(15)], ['eth-szabo', wei/E(12)],
+      ['eth-gwei', wei/E(9)], ['eth-mwei', wei/E(6)], ['eth-kwei', wei/E(3)],
+      ['eth-wei', Math.round(wei)]
     ];
     map.forEach(([id, val]) => { const el = document.getElementById(id); if (document.activeElement !== el) el.value = fmt(val); });
+    scheduleSave('eth', from, raw);
   }
 
-  function resetBTC() {
-    ['btc-btc','btc-mbtc','btc-ubtc','btc-sat'].forEach(id => document.getElementById(id).value = '');
-  }
-
-  function resetETH() {
-    ['eth-eth','eth-finney','eth-szabo','eth-gwei','eth-mwei','eth-kwei','eth-wei'].forEach(id => document.getElementById(id).value = '');
-  }
+  function resetBTC() { ['btc-btc','btc-mbtc','btc-ubtc','btc-sat'].forEach(id => document.getElementById(id).value = ''); }
+  function resetETH() { ['eth-eth','eth-finney','eth-szabo','eth-gwei','eth-mwei','eth-kwei','eth-wei'].forEach(id => document.getElementById(id).value = ''); }
 
   function copyVal(id) {
     const val = document.getElementById(id).value;
@@ -441,6 +525,8 @@
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 1500);
   }
+
+  loadHistory();
 </script>
 </body>
 </html>

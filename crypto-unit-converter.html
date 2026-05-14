@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto Unit Converter</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #eeede9;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b67;
+      --text-tertiary: #9b9b96;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --border-focus: rgba(0,0,0,0.4);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a18;
+        --bg-secondary: #242422;
+        --bg-tertiary: #2e2e2b;
+        --text-primary: #f0efeb;
+        --text-secondary: #9b9b96;
+        --text-tertiary: #6b6b67;
+        --border: rgba(255,255,255,0.12);
+        --border-hover: rgba(255,255,255,0.25);
+        --border-focus: rgba(255,255,255,0.4);
+      }
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      padding: 2rem;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .header { margin-bottom: 1.75rem; }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .header h1 i { font-size: 22px; color: var(--text-secondary); }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 7px 18px;
+      border-radius: 999px;
+      border: 0.5px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab:hover { border-color: var(--border-hover); color: var(--text-primary); }
+
+    .tab.active {
+      background: var(--text-primary);
+      color: var(--bg);
+      border-color: var(--text-primary);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .chain-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .unit-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 36px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .unit-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .unit-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .unit-input {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 14px;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .unit-input:hover { border-color: var(--border-hover); }
+
+    .unit-input:focus {
+      border-color: var(--border-focus);
+      background: var(--bg);
+    }
+
+    /* Chrome: hide number spinners */
+    .unit-input::-webkit-outer-spin-button,
+    .unit-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .unit-input[type=number] { -moz-appearance: textfield; }
+
+    .copy-btn {
+      background: transparent;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+
+    .copy-btn:active { transform: scale(0.95); }
+
+    .info-bar {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-top: 1.25rem;
+      border: 0.5px solid var(--border);
+    }
+
+    .info-bar strong { color: var(--text-primary); font-weight: 500; }
+
+    .reset-row {
+      margin-top: 1.25rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px 14px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .reset-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--text-primary);
+      color: var(--bg);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.25rem; }
+      .unit-row { grid-template-columns: 90px 1fr 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <h1>
+      <i class="ti ti-arrows-exchange" aria-hidden="true"></i>
+      Crypto Unit Converter
+    </h1>
+    <p>Nhập vào bất kỳ ô nào — các ô còn lại tự động tính</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('btc')">
+      <i class="ti ti-currency-bitcoin" aria-hidden="true"></i> Bitcoin
+    </button>
+    <button class="tab" onclick="switchTab('eth')">
+      <i class="ti ti-diamond" aria-hidden="true"></i> Ethereum
+    </button>
+  </div>
+
+  <!-- BTC Panel -->
+  <div class="panel active" id="panel-btc">
+    <div class="chain-label">Bitcoin units</div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">BTC</div><div class="unit-sub">Bitcoin</div></div>
+      <input class="unit-input" id="btc-btc" type="number" placeholder="0" oninput="convertBTC('btc', this.value)" />
+      <button class="copy-btn" onclick="copyVal('btc-btc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">mBTC</div><div class="unit-sub">Millibitcoin</div></div>
+      <input class="unit-input" id="btc-mbtc" type="number" placeholder="0" oninput="convertBTC('mbtc', this.value)" />
+      <button class="copy-btn" onclick="copyVal('btc-mbtc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">μBTC</div><div class="unit-sub">Microbitcoin / Bit</div></div>
+      <input class="unit-input" id="btc-ubtc" type="number" placeholder="0" oninput="convertBTC('ubtc', this.value)" />
+      <button class="copy-btn" onclick="copyVal('btc-ubtc')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Satoshi</div><div class="unit-sub">Smallest unit</div></div>
+      <input class="unit-input" id="btc-sat" type="number" placeholder="0" oninput="convertBTC('sat', this.value)" />
+      <button class="copy-btn" onclick="copyVal('btc-sat')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="info-bar">
+      <strong>1 BTC</strong> = 1,000 mBTC = 1,000,000 μBTC = <strong>100,000,000 Satoshi</strong>
+    </div>
+
+    <div class="reset-row">
+      <button class="reset-btn" onclick="resetBTC()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- ETH Panel -->
+  <div class="panel" id="panel-eth">
+    <div class="chain-label">Ethereum units</div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">ETH</div><div class="unit-sub">Ether</div></div>
+      <input class="unit-input" id="eth-eth" type="number" placeholder="0" oninput="convertETH('eth', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-eth')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Finney</div><div class="unit-sub">1e-3 ETH</div></div>
+      <input class="unit-input" id="eth-finney" type="number" placeholder="0" oninput="convertETH('finney', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-finney')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Szabo</div><div class="unit-sub">1e-6 ETH</div></div>
+      <input class="unit-input" id="eth-szabo" type="number" placeholder="0" oninput="convertETH('szabo', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-szabo')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Gwei</div><div class="unit-sub">Gas unit (1e-9)</div></div>
+      <input class="unit-input" id="eth-gwei" type="number" placeholder="0" oninput="convertETH('gwei', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-gwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Mwei</div><div class="unit-sub">1e-12 ETH</div></div>
+      <input class="unit-input" id="eth-mwei" type="number" placeholder="0" oninput="convertETH('mwei', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-mwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Kwei</div><div class="unit-sub">1e-15 ETH</div></div>
+      <input class="unit-input" id="eth-kwei" type="number" placeholder="0" oninput="convertETH('kwei', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-kwei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="unit-row">
+      <div><div class="unit-name">Wei</div><div class="unit-sub">Smallest unit</div></div>
+      <input class="unit-input" id="eth-wei" type="number" placeholder="0" oninput="convertETH('wei', this.value)" />
+      <button class="copy-btn" onclick="copyVal('eth-wei')" title="Copy"><i class="ti ti-copy" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="info-bar">
+      <strong>1 ETH</strong> = 10<sup>9</sup> Gwei = <strong>1,000,000,000,000,000,000 Wei</strong> (10<sup>18</sup>)
+    </div>
+
+    <div class="reset-row">
+      <button class="reset-btn" onclick="resetETH()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+  function switchTab(chain) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', (chain === 'btc' && i === 0) || (chain === 'eth' && i === 1))
+    );
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + chain).classList.add('active');
+  }
+
+  function fmt(n) {
+    if (n === '' || n === undefined || isNaN(n)) return '';
+    return parseFloat(n.toPrecision(15)).toString();
+  }
+
+  function convertBTC(from, raw) {
+    const ids = ['btc-btc', 'btc-mbtc', 'btc-ubtc', 'btc-sat'];
+    if (raw === '') { ids.forEach(id => { if (document.getElementById(id) !== document.activeElement) document.getElementById(id).value = ''; }); return; }
+    const v = parseFloat(raw);
+    if (isNaN(v)) return;
+    let btc;
+    if (from === 'btc')  btc = v;
+    if (from === 'mbtc') btc = v / 1e3;
+    if (from === 'ubtc') btc = v / 1e6;
+    if (from === 'sat')  btc = v / 1e8;
+    const vals = [btc, btc * 1e3, btc * 1e6, Math.round(btc * 1e8)];
+    ids.forEach((id, i) => { const el = document.getElementById(id); if (document.activeElement !== el) el.value = fmt(vals[i]); });
+  }
+
+  function convertETH(from, raw) {
+    const ids = ['eth-eth','eth-finney','eth-szabo','eth-gwei','eth-mwei','eth-kwei','eth-wei'];
+    if (raw === '') { ids.forEach(id => { if (document.getElementById(id) !== document.activeElement) document.getElementById(id).value = ''; }); return; }
+    const v = parseFloat(raw);
+    if (isNaN(v)) return;
+    const E = (exp) => Math.pow(10, exp);
+    let wei;
+    if (from === 'eth')    wei = v * E(18);
+    if (from === 'finney') wei = v * E(15);
+    if (from === 'szabo')  wei = v * E(12);
+    if (from === 'gwei')   wei = v * E(9);
+    if (from === 'mwei')   wei = v * E(6);
+    if (from === 'kwei')   wei = v * E(3);
+    if (from === 'wei')    wei = v;
+    const map = [
+      ['eth-eth',    wei / E(18)],
+      ['eth-finney', wei / E(15)],
+      ['eth-szabo',  wei / E(12)],
+      ['eth-gwei',   wei / E(9)],
+      ['eth-mwei',   wei / E(6)],
+      ['eth-kwei',   wei / E(3)],
+      ['eth-wei',    Math.round(wei)],
+    ];
+    map.forEach(([id, val]) => { const el = document.getElementById(id); if (document.activeElement !== el) el.value = fmt(val); });
+  }
+
+  function resetBTC() {
+    ['btc-btc','btc-mbtc','btc-ubtc','btc-sat'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function resetETH() {
+    ['eth-eth','eth-finney','eth-szabo','eth-gwei','eth-mwei','eth-kwei','eth-wei'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function copyVal(id) {
+    const val = document.getElementById(id).value;
+    if (!val) return;
+    navigator.clipboard.writeText(val).catch(() => {});
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+</script>
+</body>
+</html>
